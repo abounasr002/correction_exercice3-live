@@ -1,8 +1,11 @@
 import { Request, Response } from "express";
 import Todo from "../DBSchemas/Todo";
+import { JwtPayload } from "jsonwebtoken";
 
 export async function createTodo(req: Request, res: Response) {
     try {
+        const payload: JwtPayload = JSON.parse(req.headers.payload as string);
+        const userId = payload.id
         const { task } = req.body;
 
         //Validation des champs
@@ -11,7 +14,7 @@ export async function createTodo(req: Request, res: Response) {
             return
         }
 
-        const newTodo = new Todo({ task });
+        const newTodo = new Todo({ task, userId });
 
         const updatedTodo = await newTodo.save();
 
@@ -74,5 +77,21 @@ export async function getAllFalses(req: Request, res: Response) {
     }
     catch (err: any) {
         res.status(500).send({ message: "err.message" })
+    }
+}
+
+export async function getAllFromUser(req: Request, res: Response) {
+
+    try {
+        const payload: JwtPayload = JSON.parse(req.headers.payload as string);
+        const id = payload.id
+        if (!payload || !id) {
+            res.status(400).send({ message: "payload incorrect" })
+        }
+        const todos = await Todo.find({ userId: id })
+        res.status(200).send({ message: "todos de l'user : " + id, todos: todos })
+
+    } catch (error: any) {
+        res.status(500).send({ message: error.message })
     }
 }
