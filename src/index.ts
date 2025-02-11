@@ -3,6 +3,8 @@ import dotenv from "dotenv"
 import mongoose from "mongoose";
 import TodoRoutes from "./routes/TodoRoutes";
 import AuthRoutes from "./routes/AuthRoutes";
+import swaggerDocs from "./config/swaggers";
+import swaggerUi from "swagger-ui-express";
 
 //Création serveur express
 const app = express()
@@ -33,6 +35,9 @@ connectDB();
 app.use('/todos', TodoRoutes)
 app.use('/auth', AuthRoutes)
 
+
+// Swagger route
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 //app.listen indique au serveur d'écouter les requêtes HTTP arrivant sur le
 //port indiqué
